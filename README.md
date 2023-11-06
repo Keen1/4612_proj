@@ -1,5 +1,5 @@
 # 4612_proj
-A simple cli incident response system 
+## A simple cli incident response system.
 This program is academic in nature and should not be used as a commercial product. 
 
 This program was designed to be compiled into an exe using the pyinstaller module. It is currently only intended for use on windows systems.  
