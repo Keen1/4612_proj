@@ -4,20 +4,25 @@ import requests
 import sys
 import json
 import vt
+import os
 from datetime import datetime
 from KeyStore import *
-HISTORY_DB = "C:/Users/zach/AppData/Roaming/Mozilla/Firefox/Profiles/bieu7gia.default-release/places.sqlite"
+from DbCrawler import *
+
+
 #netalyzer class
 #get network connection data from browswer history or the psutil module
 class Netalyzer:
 	def __init__(self):
 		self.output = []
-
+	
+	
+		
 	def write_URL_Output(self, url, stats):
 		self.output.append(f"Analysis stats for {url}\n")
 		for title in stats:
 			self.output.append(f"{title}: {stats[title]}")
-		self.output.append("****************\n")
+		
 		self.output.append("****************\n")
 	
 	def write_IP_Output(self, title, harmless, mal, susp, undetected):
@@ -26,22 +31,21 @@ class Netalyzer:
 		self.output.append(mal)
 		self.output.append(susp)
 		self.output.append(undetected)
-		self.output.append("****************\n")
+		
 		self.output.append("****************\n")
 	
-	def write_Browser_Output(self, url, title, visitCount):
-		self.output.append(url)
-		self.output.append(title)
-		self.output.append(visitCount)
-		self.output.append("****************\n")
-		self.output.append("****************\n")
+	def write_Browser_Output(self, browserHistList):
+		for item in browserHistList:
+			self.output.append(item)
+		
+		
 	def write_Netcon_Output(self, family, cType, laddr, raddr):
 
 		self.output.append(family)
 		self.output.append(cType)
 		self.output.append(laddr)
 		self.output.append(raddr)
-		self.output.append("****************\n")
+		
 		self.output.append("****************\n")
 
 	def get_Output(self):
@@ -51,24 +55,73 @@ class Netalyzer:
 
 #explore the browser history of the machine(sqlite3 db path required[global var])
 	def explore_Browser_History(self):
+		
 
-		#connect to the db
-		connection = sqlite3.connect(HISTORY_DB)
-		cursor = connection.cursor()
+		entries = []
+		
+		#create a db crawler to search for databases
+		crawler = DbCrawler()
+		paths = crawler.find_Browser_History_Databases(os.path.expanduser('~'))
+		#try to connect to each of the db paths found
+		for path in paths:
+			print(f"Collecting browser history from: {path}")
+			
+			try:
 
-		#pull data from the db
-		cursor.execute("SELECT url, title, visit_count FROM moz_places")
-		entries = cursor.fetchall()
+				connection = sqlite3.connect(path)
+				cursor = connection.cursor()
 
-		#TODO - expand class to output to std or to a file given a path
-		for entry in entries:
-			url, title, visitCount  = entry
-			url = f"URL: {url}\n"
-			title = f"Title: {title}\n"
-			visitCount = f"Visit count: {visitCount}\n"
+				#pull data from the db
+				#depending on the browser the db schema will differ
+				#browser history in mozilla db is stored in moz_places
+				#browser history in chrome and edge are stored in urls table
+				if "Firefox" in path:
+					
+					cursor.execute("SELECT url, title, visit_count FROM moz_places")
+					entries = cursor.fetchall()
+				
+				elif "Chrome" in path or "Edge" in path:
+					cursor.execute("SELECT url, title, visit_count FROM urls")
+					entries = cursor.fetchall()
 
 
-			self.write_Browser_Output(url, title, visitCount)
+			except sqlite3.Error:
+				print("An error occurred when trying to access db:")
+				print(path)
+
+			#TODO - expand class to output to std or to a file given a path
+			if len(entries) == 0:
+				print(f"No browser history found in {path} database.")
+			else:
+
+				
+				pathStr = f"BROWSER HISTORY FROM :  {path}\n"
+				browserHistList = []
+				browserHistList.append("********************\n")
+				browserHistList.append("********************\n")
+				browserHistList.append(pathStr)
+				browserHistList.append("********************\n")
+				browserHistList.append("********************\n")
+				
+				
+				
+
+				for entry in entries:
+					url, title, visitCount  = entry
+					if visitCount == 0:
+						continue
+					url = f"URL: {url}\n"
+					title = f"Title: {title}\n"
+					visitCount = f"Visit count: {visitCount}\n"
+					browserHistList.append(url)
+					browserHistList.append(title)
+					browserHistList.append(visitCount)
+					browserHistList.append("****************\n")
+
+				self.write_Browser_Output(browserHistList)
+
+
+				
 
 	#explore the network history of current processes on the machine 
 	def explore_Net_History(self):
@@ -99,7 +152,7 @@ class Netalyzer:
 				ks = KeyStore()
 				key = ks.get_API_Key()
 				if not key:
-					print("Error, something went wrong")
+					print("Erroy when attempting to access VirusTotal api key.")
 					sys.exit()
 
 				client = vt.Client(key.decode())

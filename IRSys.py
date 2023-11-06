@@ -2,6 +2,7 @@ import argparse
 import validators
 import ipaddress
 import sys
+import re
 from Procalyzer import *
 from Netalyzer import *
 from LogCollector import *
@@ -25,7 +26,7 @@ def init_Parser():
 		help="Collect a list of running processes.")
 	#connections arugment
 	parser.add_argument("-n", "--net", action="store_true", help="Collect network connection data.")
-	parser.add_argument("-b", "--browser", action="store_true", help="Collect browser histoy data.")
+	parser.add_argument("-b", "--browser", action="store_true", help="Collect browser history data.")
 
 	#scanning arguments
 	parser.add_argument("-si", "--scanip", nargs=1, help="Scan an ip address using the virustotal api" )
@@ -59,6 +60,7 @@ def handle_Output(output,  path=None):
 	if path is not None:
 		with open(path, 'w') as file:
 			for line in output:
+				line = re.sub(r'[^\x00-\x7F]+', '?', line)
 				file.write(line)
 		file.close()
 		
