@@ -11,6 +11,7 @@ class VtScanner:
 	
 	#get stats relating to an ip
 	def get_Ip_Stats(self, ip):
+		jsonPath = "vtIpScan.json"
 		#prompt for api key
 		ks = KeyStore()
 		key = ks.get_API_Key()
@@ -32,7 +33,7 @@ class VtScanner:
 			titleStr = f"Analysis stats for ip: {ip}\n"
 			self.write_Prelim_Data(titleStr, ipStats)
 			#write the full json to a file
-			jsonPath = ip + ".json"
+			
 			self.write_Full_Json(responseData, jsonPath)
 			print(f"Successfully wrote json to {jsonPath}")
 		#catch
@@ -48,6 +49,7 @@ class VtScanner:
 	# 2) Query the api based on that unique url-id
 	# TODO - Format the url to generate the url_id and reduce requests by 1
 	def get_Url_Stats(self, url):
+		jsonPath = "vtUrlScan.json"
 		#prompt for api key
 		ks = KeyStore()
 		key = ks.get_API_Key()
@@ -89,7 +91,7 @@ class VtScanner:
 				titleStr = f"Analysis stats for {url}\n"
 				self.write_Prelim_Data(titleStr, urlStats)
 				#write the full json to a file
-				jsonPath = url + ".json"
+				
 				self.write_Full_Json(finResponseData, jsonPath)
 				print(f"Successfully wrote json to {jsonPath}")
 
@@ -109,6 +111,7 @@ class VtScanner:
 		print(stats)
 	#output the full json response to a file
 	def write_Full_Json(self, jsonObj, path):
+		path = path.strip("//")
 		with open(path, "w") as file:
 			json.dump(jsonObj, file, indent=4)
 

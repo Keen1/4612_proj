@@ -3,7 +3,6 @@ import psutil
 import sys
 import os
 from datetime import datetime
-from KeyStore import *
 from DbCrawler import *
 
 
@@ -117,5 +116,8 @@ class Netalyzer:
 			raddr = f"Remote Address: {conn.raddr}\n"
 			self.write_Netcon_Output(famStr, typeStr, laddr, raddr)
 			
+
+	
+
 
 

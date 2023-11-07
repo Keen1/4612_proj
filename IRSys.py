@@ -127,8 +127,9 @@ if __name__ =="__main__":
 			logColl = LogCollector()
 			logColl.run()
 			output = logColl.get_Evt_Outputs()
-			print(output)
+			
 			handle_Output(output, outPath)
+			print("Event logs collected.")
 		
 		if args.event_id:
 			print(f"Collecting logs for event-id {args.event_id}...")
@@ -145,18 +146,24 @@ if __name__ =="__main__":
 			plyzer.run()
 			output = plyzer.get_Proc_Outputs()
 			handle_Output(output, outPath)
+		
 		#net flag was used
 		if args.net:
+			print("Collecting network connections...")
 			nalyzer = Netalyzer()
 			nalyzer.explore_Net_History()
 			nOut = nalyzer.get_Output()
 			handle_Output(nOut, outPath)
+			print("Network connections collected.")
+		
 		#browser flag was used
 		if args.browser:
+			print("Collecting browser history...")
 			balyzer = Netalyzer()
 			balyzer.explore_Browser_History()
 			bOut = balyzer.get_Output()
 			handle_Output(bOut, outPath)
+			print("Browser history collected.")
 
 		#scan url flag used
 		if args.scanurl:
@@ -166,6 +173,7 @@ if __name__ =="__main__":
 				print("Malformed URL, enter a valid URL to scan.")
 				sys.exit()
 			else:
+				print("Scanning url...")
 				vtScan = VtScanner()
 				vtScan.get_Url_Stats(urlAddr)
 				
@@ -179,7 +187,7 @@ if __name__ =="__main__":
 				print("Malformed IP address, enter a valid IP address to scan.")
 				sys.exit()
 			else:
-				
+				print("Scanning ip...")
 				vtScan = VtScanner()
 				vtScan.get_Ip_Stats(ipAddr)
 				
