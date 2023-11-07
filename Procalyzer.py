@@ -43,7 +43,7 @@ class Procalyzer:
 		#files that the process is accessing
 		for fp in open_files:
 			self.outputs.append(fp)
-		self.outputs.append("Remote Connections: \n")
+		self.outputs.append("\nRemote Connections: \n")
 		
 		#remote connections the process is making
 		for remConn in remote_conns:

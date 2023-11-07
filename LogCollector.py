@@ -43,7 +43,7 @@ class LogCollector:
 		result += f"Event ID: {evtID}\n"
 		result += f"Event Message: {eventMessage}\n"
 		result += f"Source: {evtSrc}\n"
-		print(result)
+		
 		self.eventOutputs.append(result)
 
 	def get_Evt_Outputs(self):

@@ -1,13 +1,11 @@
 import sqlite3 
 import psutil
-import requests
 import sys
-import json
-import vt
 import os
 from datetime import datetime
 from KeyStore import *
 from DbCrawler import *
+
 
 
 #netalyzer class
@@ -15,24 +13,6 @@ from DbCrawler import *
 class Netalyzer:
 	def __init__(self):
 		self.output = []
-	
-	
-		
-	def write_URL_Output(self, url, stats):
-		self.output.append(f"Analysis stats for {url}\n")
-		for title in stats:
-			self.output.append(f"{title}: {stats[title]}")
-		
-		self.output.append("****************\n")
-	
-	def write_IP_Output(self, title, harmless, mal, susp, undetected):
-		self.output.append(title)
-		self.output.append(harmless)
-		self.output.append(mal)
-		self.output.append(susp)
-		self.output.append(undetected)
-		
-		self.output.append("****************\n")
 	
 	def write_Browser_Output(self, browserHistList):
 		for item in browserHistList:
@@ -137,51 +117,5 @@ class Netalyzer:
 			raddr = f"Remote Address: {conn.raddr}\n"
 			self.write_Netcon_Output(famStr, typeStr, laddr, raddr)
 			
-
-	
-	#scan a url or ip address in virustotal
-	def vt_Scan(self, url=None, ip=None):
-		#get the key
-		
-		#if key is none something went wrong
-
-		with requests.Session() as session:
-
-			#if we are getting info about a url we can use the vt api function provided
-			if url:
-				ks = KeyStore()
-				key = ks.get_API_Key()
-				if not key:
-					print("Erroy when attempting to access VirusTotal api key.")
-					sys.exit()
-
-				client = vt.Client(key.decode())
-				url_id = vt.url_id(url)
-				urlObj = client.get_object("/urls/{}", url_id)
-				
-				self.write_URL_Output(url, urlObj.last_analysis_stats)
-				client.close()
-			#vt doesn't provide a function for ip scans like it does for urls.
-			#need to post a request and then parse the json
-			if ip:
-				ks = KeyStore()
-				url = f"https://www.virustotal.com/api/v3/ip_addresses/{ip}"
-				headers = {
-					"accept": "application/json",
-					"x-apikey": f"{ks.get_API_Key()}"}
-				response = session.get(url, headers=headers)
-				
-				jsonDat = json.loads(response.text)
-				lastAnalysisStats = jsonDat["data"]["attributes"]["last_analysis_stats"]
-				#format to write
-				titleStr = f"Last Analysis Stats\n"
-				harmlessStr = f"Harmless: {lastAnalysisStats['harmless']}\n"
-				malStr = f"Malicious: {lastAnalysisStats['malicious']}\n"
-				suspStr = f"Suspicious: {lastAnalysisStats['suspicious']}\n"
-				undetectStr = f"Undetected: {lastAnalysisStats['undetected']}\n" 
-				#write the output
-				self.write_IP_Output(titleStr, harmlessStr, malStr, suspStr, undetectStr)
-
-
 
 

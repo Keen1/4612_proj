@@ -3,9 +3,11 @@ import validators
 import ipaddress
 import sys
 import re
+import json
 from Procalyzer import *
 from Netalyzer import *
 from LogCollector import *
+from VtScanner import *
 
 #driver
 
@@ -54,6 +56,9 @@ def valid_IP(ip):
 	except ValueError:
 		return False
 
+
+
+
 #handle output
 def handle_Output(output,  path=None):
 	#if the path is not none the user wants output to a file
@@ -63,7 +68,7 @@ def handle_Output(output,  path=None):
 				line = re.sub(r'[^\x00-\x7F]+', '?', line)
 				file.write(line)
 		file.close()
-		
+		sys.exit()
 	#standard output
 	if path is None:
 		for line in output:
@@ -161,10 +166,10 @@ if __name__ =="__main__":
 				print("Malformed URL, enter a valid URL to scan.")
 				sys.exit()
 			else:
-				nalyzer = Netalyzer()
-				nalyzer.vt_Scan(url=urlAddr)
-				scanOutput = nalyzer.get_Output()
-				handle_Output(scanOutput, outPath)
+				vtScan = VtScanner()
+				vtScan.get_Url_Stats(urlAddr)
+				
+				
 		
 		#scan ip flag used	
 		if args.scanip:
@@ -174,6 +179,8 @@ if __name__ =="__main__":
 				print("Malformed IP address, enter a valid IP address to scan.")
 				sys.exit()
 			else:
-				nalyzer = Netalyzer()
-				nalyzer.vt_Scan(ip=ipAddr)
+				
+				vtScan = VtScanner()
+				vtScan.get_Ip_Stats(ipAddr)
+				
 		
