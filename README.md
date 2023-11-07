@@ -2,7 +2,7 @@
 ## A simple cli incident response system.
 This program is academic in nature and should not be used as a commercial product. 
 
-This program was designed to be compiled into an exe using the pyinstaller module. It is currently only intended for use on windows systems.  
+This program was designed for data collection on windows systems.  
 
 It should be noted that the handling of the API key has room for improvement. Currently, to use the virustotal api scanning functionality you must:
 
